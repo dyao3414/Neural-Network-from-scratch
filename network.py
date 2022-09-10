@@ -1,16 +1,13 @@
 import sys
-import pandas as pd
 import numpy as np
-from PIL import Image
-import os
+from torchvision import datasets
+from tqdm.auto import tqdm
 
 
 np.set_printoptions(threshold=sys.maxsize)
 np.set_printoptions(formatter={'float_kind':'{:f}'.format})
 np.random.seed(1)
-from scipy.special import softmax
-from torchvision import datasets
-from tqdm.auto import tqdm
+
 
 
 def init_setup():
@@ -30,11 +27,8 @@ def activate(A):
     Z=np.maximum(0,A)
     return Z
 
-# def softmax(Z):
-     
-#     ret=np.exp(Z)/np.sum(np.exp(Z))
-#     return np.nan_to_num(ret)
-
+def softmax(x):
+    return(np.exp(x - np.max(x)) / np.exp(x - np.max(x)).sum())
 
 def forward_propagation(A,w1,b1,w2,b2,w3,b3):
 #每层数据尺寸
@@ -45,6 +39,7 @@ def forward_propagation(A,w1,b1,w2,b2,w3,b3):
 
     z3=w3@A2+b3
     #print("z3",z3.shape)
+    # prob=softmax(z3,axis= 0)
     prob=softmax(z3)
     #print("prob",prob.shape)
     prob=prob.reshape(-1,1)
