@@ -26,5 +26,5 @@ def data_tocsv(dir,name):
     np.savetxt(f"{name}", first[1:], delimiter=",")
 
 if __name__=="__main__":
-    data_tocsv('./MNIST - JPG - training','train_images.csv')
-    data_tocsv('./MNIST - JPG - testing','test_images.csv')
+    data_tocsv('./MNIST - JPG - training','./files/train_images.csv')
+    data_tocsv('./MNIST - JPG - testing','./files/test_images.csv')

@@ -29,7 +29,7 @@ def softmax(x):
     return(np.exp(x - np.max(x)) / np.exp(x - np.max(x)).sum())
 
 def forward_propagation(A,w1,b1,w2,b2,w3,b3):
-#每层数据尺寸
+
     z1=w1@A+b1
     A1=activate(z1)
     z2=w2@A1+b2
@@ -134,24 +134,21 @@ def learn(X,y,X_test,Y_test,epcohs):
 
 if __name__ == "__main__":
     # mnist = datasets.MNIST(root = "./dataset/",download = True,transform=lambda x : np.asarray(x)/255.0)
-    mnist=np.genfromtxt('train_images.csv', delimiter=',')
+    mnist=np.genfromtxt('files/train_images.csv', delimiter=',')
     np.random.shuffle(mnist)
     labels=mnist[:,0]
     values=mnist[:,1:]/255
     #read test imges csv
-    mnist_test=np.genfromtxt('test_images.csv', delimiter=',')
+    mnist_test=np.genfromtxt('files/test_images.csv', delimiter=',')
     np.random.shuffle(mnist_test)
     labels_test=mnist[:,0]
     values_test=mnist[:,1:]/255
 
-    # dataset=zip(labels,values) #zip label, values together
-    # for img in tqdm(dataset):
-    #     label,value=img
     X  = np.array(values).reshape(-1,784)
     Y  = np.array(labels,dtype = "int")
     X_test  = np.array(values_test).reshape(-1,784)
     Y_test  = np.array(labels_test,dtype = "int")
     
     w1,b1,w2,b2,w3,b3 = learn(X,Y,X_test,Y_test,10)
-    np.savez('network',w1=w1,w2=w2,w3=w3,b1=b1,b2=b2,b3=b3)
+    np.savez('files/network',w1=w1,w2=w2,w3=w3,b1=b1,b2=b2,b3=b3)
 
