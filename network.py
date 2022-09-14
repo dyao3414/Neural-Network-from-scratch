@@ -1,10 +1,8 @@
-import sys
 import numpy as np
-from torchvision import datasets
 from tqdm.auto import tqdm
 
 
-np.set_printoptions(threshold=sys.maxsize)
+# np.set_printoptions(threshold=sys.maxsize)
 np.set_printoptions(formatter={'float_kind':'{:f}'.format})
 np.random.seed(1)
 
@@ -97,21 +95,21 @@ def step(lr,w1,b1,w2,b2,w3,b3,dw1,db1,dw2,db2,dw3,db3):
     
     return w1,b1,w2,b2,w3,b3
 
-def evaluate(X,y,w1,b1,w2,b2,w3,b3):
+def evaluate(X_test,y_test,w1,b1,w2,b2,w3,b3):
     hit = 0
-    for i,A in enumerate(X):
+    for i,A in enumerate(X_test):
         prob    = forward_propagation(A.reshape(-1,1),w1,b1,w2,b2,w3,b3)[-1]
-        if prob.argmax() == y[i]:
+        if prob.argmax() == y_test[i]:
             hit += 1
     return hit/len(X)
     
     
 
-def learn(X,y):
+def learn(X,y,X_test,Y_test,epcohs):
     lr=0.001
     w1,b1,w2,b2,w3,b3=init_setup()
     #read data from csv
-    for epoch in range(10):
+    for epoch in range(epcohs):
         # lr=lr/10
         bar = tqdm(range(len(X[1:])))
         for i in bar:
@@ -127,7 +125,7 @@ def learn(X,y):
             db1,dw1,dw2,db2,dw3,db3= back_propagation(A,z1,A1,z2,A2,z3,prob,w1,w2,w3,Y,lr)
             #print(dw1)
             w1,b1,w2,b2,w3,b3      = step(lr,w1,b1,w2,b2,w3,b3,dw1,db1,dw2,db2,dw3,db3)
-        acc = evaluate(X,y,w1,b1,w2,b2,w3,b3)
+        acc = evaluate(X_test,Y_test,w1,b1,w2,b2,w3,b3)
         print("epoch",epoch,"accuracy",acc)
 
     return  w1,b1,w2,b2,w3,b3
@@ -135,13 +133,25 @@ def learn(X,y):
 
 
 if __name__ == "__main__":
-    mnist = datasets.MNIST(root = "./dataset/",download = True,transform=lambda x : np.asarray(x)/255.0)
-    X  = []
-    Y  = []
-    for img,label in tqdm(mnist):
-        X.append(img)
-        Y.append(label)
-    X  = np.array(X).reshape(-1,784)
-    Y  = np.array(Y,dtype = "int")
+    # mnist = datasets.MNIST(root = "./dataset/",download = True,transform=lambda x : np.asarray(x)/255.0)
+    mnist=np.genfromtxt('train_images.csv', delimiter=',')
+    np.random.shuffle(mnist)
+    labels=mnist[:,0]
+    values=mnist[:,1:]/255
+    #read test imges csv
+    mnist_test=np.genfromtxt('test_images.csv', delimiter=',')
+    np.random.shuffle(mnist_test)
+    labels_test=mnist[:,0]
+    values_test=mnist[:,1:]/255
+
+    # dataset=zip(labels,values) #zip label, values together
+    # for img in tqdm(dataset):
+    #     label,value=img
+    X  = np.array(values).reshape(-1,784)
+    Y  = np.array(labels,dtype = "int")
+    X_test  = np.array(values_test).reshape(-1,784)
+    Y_test  = np.array(labels_test,dtype = "int")
     
-    w1,b1,w2,b2,w3,b3 = learn(X,Y)
+    w1,b1,w2,b2,w3,b3 = learn(X,Y,X_test,Y_test,10)
+    np.savez('network',w1=w1,w2=w2,w3=w3,b1=b1,b2=b2,b3=b3)
+
